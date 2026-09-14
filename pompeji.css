@@ -1,0 +1,256 @@
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+/*Das ist die gesamte Scrollstrecke: Erweitern, wenn Website länger wird! Wichtig!*/
+.parallax-section {
+    height: 700vh;
+    position: relative;
+}
+
+/*Dieser Bereich bleibt beim Scrollen am Bildschirm "kleben".*/
+.parallax {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.layer {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 100%;
+    height: auto;
+    pointer-events: none;
+    will-change: transform;
+}
+
+.layer1 { z-index: 1; }
+.layer2 { z-index: 2; }
+.layer3 { z-index: 3; }
+.layer4 { z-index: 4; }
+.layer5 { z-index: 5; }
+.layer6 { z-index: 6; }
+.layer7 { z-index: 7; }
+
+.content {
+    min-height: 100vh;
+    padding: 80px;
+    background: white;
+    position: relative;
+    z-index: 20;
+}
+
+/*--------------------------Prolog----------------------*/
+
+.prolog {
+    position: absolute;
+
+    z-index: 20;
+
+    top: 18vh;
+    left: 0;
+
+    width: 100%;
+    height: 100px;
+
+    overflow: hidden;
+
+    pointer-events: none;
+}
+
+
+.prolog-text {
+    position: absolute;
+
+    top: 50%;
+    left: 0;
+
+    display: flex;
+
+    gap: 0.45em;
+
+    white-space: nowrap;
+
+    font-size: clamp(22px, 2.2vw, 36px);
+
+    transform: translateY(-50%);
+
+    color: white;
+}
+
+
+.prolog-text span {
+    opacity: 0;
+
+    filter: blur(8px);
+
+    transition:
+        opacity 0.05s linear,
+        filter 0.05s linear;
+}
+
+/*---------------------Titel Hintergrund--------------------*/
+
+.title-cloud {
+    position: absolute;
+    left: 50%;
+
+    width: 110%;
+    height: auto;
+
+    pointer-events: none;
+    opacity: 0;
+
+    will-change: transform, opacity;
+
+    /* untere Rauchkante weich auslaufen lassen */
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        black 0%,
+        black 68%,
+        rgba(0, 0, 0, 0.9) 75%,
+        rgba(0, 0, 0, 0.55) 87%,
+        transparent 100%
+    );
+
+    mask-image: linear-gradient(
+        to bottom,
+        black 0%,
+        black 68%,
+        rgba(0, 0, 0, 0.9) 75%,
+        rgba(0, 0, 0, 0.55) 87%,
+        transparent 100%
+    );
+}
+
+
+/* hintere Wolkenschicht */
+.title-cloud1 {
+    z-index: 25;
+}
+
+/* mittlere Wolkenschicht */
+.title-cloud15 {
+    z-index: 26;
+}
+
+/* vordere Wolkenschicht */
+.title-cloud2 {
+    z-index: 27;
+}
+
+/*------------------------Titel---------------------*/
+
+.title-screen {
+    position: absolute;
+    inset: 0;
+
+    z-index: 30;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    pointer-events: none;
+
+    opacity: 0;
+}
+
+
+.title-screen h1 {
+    margin: 0;
+
+    text-align: center;
+
+    color: white;
+
+    font-family: Georgia, serif;
+
+    text-transform: uppercase;
+}
+
+
+.title-small {
+    display: block;
+
+    font-size: clamp(18px, 2vw, 32px);
+
+    font-weight: normal;
+
+    letter-spacing: 0.35em;
+
+    margin-bottom: 0.3em;
+}
+
+
+.title-pompeji {
+    display: block;
+
+    font-size: clamp(70px, 10vw, 160px);
+
+    line-height: 0.9;
+
+    letter-spacing: 0.18em;
+}
+
+/*------------------------Info Text nach Titel------------------------*/
+
+.intro-info {
+    position: absolute;
+    inset: 0;
+
+    z-index: 31;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    color: white;
+
+    pointer-events: none;
+
+    /* zunächst komplett unsichtbar */
+    opacity: 0;
+
+    /* startet minimal tiefer und unschärfer */
+    transform: translateY(20px);
+    filter: blur(6px);
+
+    will-change: opacity, transform, filter;
+}
+
+
+.intro-author {
+    margin: 0 0 1.2rem;
+
+    font-family: Georgia, serif;
+    font-size: clamp(20px, 2vw, 32px);
+
+    letter-spacing: 0.12em;
+}
+
+
+.intro-note {
+    margin: 0;
+
+    max-width: 650px;
+
+    font-family: Georgia, serif;
+    font-size: clamp(14px, 1.2vw, 19px);
+
+    line-height: 1.7;
+
+    opacity: 0.75;
+}

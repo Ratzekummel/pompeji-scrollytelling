@@ -1,0 +1,12 @@
+# Betriebssystem
+.DS_Store
+Thumbs.db
+
+# VS Code – nur lokale Einstellungen
+.vscode/
+
+# Temporäre Dateien
+*.tmp
+*.bak
+
+images/Pompeji1savefile.png
