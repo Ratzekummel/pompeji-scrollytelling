@@ -254,3 +254,80 @@ body {
 
     opacity: 0.75;
 }
+
+/* ------------------------ Szene 2 ------------------------ */
+
+.scene2-section {
+    position: relative;
+    height: 450vh;
+}
+
+.scene2-sticky {
+    position: sticky;
+    top: 0;
+
+    width: 100%;
+    height: 100vh;
+
+    overflow: hidden;
+
+    opacity: 0;
+    filter: blur(10px);
+
+    will-change: opacity, filter, transform;
+}
+
+.scene2-image {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    object-position: center center;
+
+    transform: scale(1);
+
+    will-change: transform;
+}
+
+.scene2-overlay {
+    position: absolute;
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.08);
+
+    pointer-events: none;
+}
+
+.scene2-text {
+    position: absolute;
+    left: 50%;
+    bottom: 12vh;
+
+    transform: translateX(-50%) translateY(20px);
+
+    width: min(800px, 80vw);
+
+    text-align: center;
+
+    color: white;
+
+    opacity: 0;
+    filter: blur(8px);
+
+    pointer-events: none;
+
+    will-change: opacity, transform, filter;
+}
+
+.scene2-text p {
+    margin: 0;
+
+    font-family: Georgia, serif;
+    font-size: clamp(20px, 2vw, 34px);
+    line-height: 1.5;
+
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+}

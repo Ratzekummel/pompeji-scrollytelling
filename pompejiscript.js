@@ -13,6 +13,15 @@ const cloud2 = document.querySelector(".title-cloud2");
 //Titel Infotext (Autor etc)
 const introInfo = document.querySelector(".intro-info");
 
+//Szene 2
+const scene2Section = document.querySelector(".scene2-section");
+const scene2Sticky = document.querySelector(".scene2-sticky");
+const scene2Image = document.querySelector(".scene2-image");
+
+const scene2Text1 = document.querySelector(".scene2-text1");
+const scene2Text2 = document.querySelector(".scene2-text2");
+const scene2Text3 = document.querySelector(".scene2-text3");
+
 const parallaxStrength = [
     0,
     10,
@@ -35,6 +44,13 @@ function clamp(value, min = 0, max = 1) {
     return Math.max(min, Math.min(max, value));
 }
 
+function smoothstep(value) {
+    return value * value * (3 - 2 * value);
+}
+
+function rangeProgress(progress, start, end) {
+    return clamp((progress - start) / (end - start));
+}
 
 function updateParallax() {
 
@@ -208,6 +224,17 @@ function updateParallax() {
     */
 
     updateTitle(titleProgress);
+
+
+    const scene2ScrollDistance =
+        scene2Section.offsetHeight - window.innerHeight;
+
+    let scene2Progress =
+        (window.scrollY - scene2Section.offsetTop) / scene2ScrollDistance;
+
+    scene2Progress = clamp(scene2Progress);
+
+    updateScene2(scene2Progress);
 }
 
 
@@ -698,4 +725,83 @@ function updateTitle(progress) {
 
     introInfo.style.transform =
         `translateY(${infoY}px)`;
+}
+
+//------------------------------------------------------------ Szene 2 ----------------------------------------------------
+
+function updateScene2(progress) {
+
+    /*
+        -----------------------------
+        Szene selbst einblenden
+        -----------------------------
+    */
+
+    let revealProgress = rangeProgress(progress, 0.00, 0.12);
+    revealProgress = smoothstep(revealProgress);
+
+    scene2Sticky.style.opacity = revealProgress;
+    scene2Sticky.style.filter = `blur(${(1 - revealProgress) * 10}px)`;
+
+
+    /*
+        -----------------------------
+        Leichter Kamerazoom
+        -----------------------------
+    */
+
+    let zoomProgress = rangeProgress(progress, 0.00, 0.85);
+    zoomProgress = smoothstep(zoomProgress);
+
+    const scale = 1 + 0.04 * zoomProgress;
+
+    scene2Image.style.transform = `scale(${scale})`;
+
+
+    /*
+        -----------------------------
+        Text 1
+        -----------------------------
+    */
+
+    let text1In = smoothstep(rangeProgress(progress, 0.12, 0.20));
+    let text1Out = smoothstep(rangeProgress(progress, 0.28, 0.36));
+    let text1Opacity = text1In * (1 - text1Out);
+
+    scene2Text1.style.opacity = text1Opacity;
+    scene2Text1.style.filter = `blur(${(1 - text1Opacity) * 8}px)`;
+    scene2Text1.style.transform =
+        `translateX(-50%) translateY(${20 * (1 - text1Opacity)}px)`;
+
+
+    /*
+        -----------------------------
+        Text 2
+        -----------------------------
+    */
+
+    let text2In = smoothstep(rangeProgress(progress, 0.36, 0.44));
+    let text2Out = smoothstep(rangeProgress(progress, 0.54, 0.62));
+    let text2Opacity = text2In * (1 - text2Out);
+
+    scene2Text2.style.opacity = text2Opacity;
+    scene2Text2.style.filter = `blur(${(1 - text2Opacity) * 8}px)`;
+    scene2Text2.style.transform =
+        `translateX(-50%) translateY(${20 * (1 - text2Opacity)}px)`;
+
+
+    /*
+        -----------------------------
+        Text 3
+        -----------------------------
+    */
+
+    let text3In = smoothstep(rangeProgress(progress, 0.62, 0.70));
+    let text3Out = smoothstep(rangeProgress(progress, 0.82, 0.90));
+    let text3Opacity = text3In * (1 - text3Out);
+
+    scene2Text3.style.opacity = text3Opacity;
+    scene2Text3.style.filter = `blur(${(1 - text3Opacity) * 8}px)`;
+    scene2Text3.style.transform =
+        `translateX(-50%) translateY(${20 * (1 - text3Opacity)}px)`;
 }
