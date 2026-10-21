@@ -26,18 +26,18 @@ const parallaxStrength = [
     0,
     10,
     100,
-    190,
-    260,
-    280,
-    290
+    170,
+    210,
+    240,
+    260
 ];
 
 const separationStart = 0.55;
 
 
 // ------------------------------------------ AUFTEILUNG DER GESAMTEN SCROLLSTRECKE ---------------------------------
-const PROLOG_END = 0.4;
-const PARALLAX_END = 0.7;
+const PROLOG_END = 0.2;
+const PARALLAX_END = 0.65;
 
 
 function clamp(value, min = 0, max = 1) {
@@ -244,487 +244,243 @@ window.addEventListener("load", updateParallax);
 
 function updateProlog(progress) {
 
-    const text =
-        document.querySelector(".prolog-text");
+    const lines = document.querySelectorAll(".prolog-line");
+    const lineCount = lines.length;
 
-    const words =
-        document.querySelectorAll(".prolog-text span");
+    if (lineCount === 0) return;
 
+    const segmentLength = 1 / lineCount;
 
-    /*
-        Gesamte Zeile von rechts nach links bewegen
-    */
+    lines.forEach((line, index) => {
 
-    const textWidth =
-        text.scrollWidth;
+        /*
+            Jede Zeile bekommt ihren eigenen
+            Abschnitt des Prolog-Scrollwegs.
+        */
 
-    const startX =
-        window.innerWidth * 0.85;
+        const start = index * segmentLength;
 
-    const endX =
-        -textWidth * 0.85;
+        let localProgress =
+            (progress - start) / segmentLength;
 
-
-    const x =
-        startX +
-        (endX - startX) * progress;
-
-
-    text.style.transform =
-        `translate(${x}px, -50%)`;
-
-
-    /*
-        Fokuspunkt:
-        ungefähr Mitte des Bildschirms
-    */
-
-    const focusX =
-        window.innerWidth * 0.5;
-
-
-    words.forEach(word => {
-
-        const rect =
-            word.getBoundingClientRect();
-
-        const wordCenter =
-            rect.left + rect.width / 2;
+        localProgress = clamp(localProgress);
 
 
         /*
-            Abstand vom Fokuspunkt
+            EINBLENDEN
         */
 
-        const distance =
-            Math.abs(wordCenter - focusX);
+        let fadeIn = clamp(localProgress / 0.20);
+
+        fadeIn = smoothstep(fadeIn);
 
 
         /*
-            Wie weit reicht unser Fokusbereich?
+            AUSBLENDEN
         */
 
-        const focusRange =
-            window.innerWidth * 0.32;
+        let fadeOut = clamp(
+            (localProgress - 0.80) / 0.20
+        );
 
-
-        let visibility =
-            1 - distance / focusRange;
-
-        visibility =
-            clamp(visibility);
+        fadeOut = smoothstep(fadeOut);
 
 
         /*
-            Unterschied zwischen links und rechts:
-
-            links = schneller verschwinden
-            rechts = langsam auftauchen
+            Sichtbarkeit
         */
 
-        if (wordCenter < focusX) {
+        const opacity = fadeIn * (1 - fadeOut);
 
-            visibility =
-                Math.pow(visibility, 1.6);
-
-        } else {
-
-            visibility =
-                Math.pow(visibility, 0.7);
-        }
+        line.style.opacity = opacity;
 
 
-        word.style.opacity =
-            visibility;
+        /*
+            Unschärfe
+        */
+
+        const blur = (1 - opacity) * 8;
+
+        line.style.filter = `blur(${blur}px)`;
 
 
-        const blur =
-            (1 - visibility) * 8;
+        /*
+            Leichte Bewegung nach oben
+        */
 
+        const y = 12 * (1 - opacity);
 
-        word.style.filter =
-            `blur(${blur}px)`;
+        line.style.transform =
+            `translate(-50%, calc(-50% + ${y}px))`;
     });
-
-
-    /*
-        Ganz am Ende verschwindet der komplette
-        Prolog, damit definitiv nichts hängen bleibt.
-    */
-
-    const fadeOutStart = 0.90;
-
-    let overallOpacity = 1;
-
-
-    if (progress > fadeOutStart) {
-
-        overallOpacity =
-            1 -
-            (progress - fadeOutStart) /
-            (1 - fadeOutStart);
-
-    }
-
-
-    text.style.opacity =
-        clamp(overallOpacity);
 }
 
 
 //einfliegender Rauch und Titel der Website
-function updateTitle(progress) {
-
-    /*
-        ====================================
-        EINSTELLUNGEN
-        ====================================
-    */
-
-    // Wann startet Layer 2?
-    const cloud2Delay = 0.08;
-
-    // Wann sollen die Wolken ihre Endposition
-    // ungefähr erreicht haben?
-    const cloudMovementEnd = 0.72;
-
-    // Ab wann erscheint der Titel?
-    const titleStart = 0.58;
-
-
-    /*
-        ====================================
-        WOLKE 1
-        ====================================
-    */
-
-    const cloud1Start =
-        -cloud1.offsetHeight * 0.90;
-
-    /*
-        Wichtig:
-        Die Wolke fährt NICHT komplett
-        aus dem Bildschirm heraus.
-
-        Sie endet noch sichtbar im Viewport.
-
-        Ein Teil liegt unterhalb des Fensters,
-        damit die unregelmäßige Unterkante
-        keine Lücken erzeugt.
-    */
-    const cloud1End =
-        -cloud1.offsetHeight * 0.45 + 400;
-
-
-    let cloud1Progress =
-        progress / cloudMovementEnd;
-
-    cloud1Progress =
-        clamp(cloud1Progress);
-
-    // weich beschleunigen / abbremsen
-    cloud1Progress =
-        cloud1Progress *
-        cloud1Progress *
-        (3 - 2 * cloud1Progress);
-
-
-    const cloud1Y =
-        cloud1Start +
-        (cloud1End - cloud1Start) *
-        cloud1Progress;
-
-    /*
-    ====================================
-    WOLKE 1.5 – MITTLERE EBENE
-    ====================================
-    */
-
-    const cloud15Delay = 0.04;
-
-    let cloud15Progress =
-        (progress - cloud15Delay) /
-        (cloudMovementEnd - cloud15Delay);
-
-    cloud15Progress =
-        clamp(cloud15Progress);
-
-
-    /*
-        Smoothstep
-    */
-
-    cloud15Progress =
-        cloud15Progress *
-        cloud15Progress *
-        (3 - 2 * cloud15Progress);
-
-
-    /*
-        Startposition
-
-        Liegt zwischen Layer 1 und Layer 2.
-    */
-
-    const cloud15Start =
-        -cloud15.offsetHeight * 0.925;
-
-
-    /*
-        Endposition
-
-        Ebenfalls zwischen Layer 1 und Layer 2.
-    */
-
-    const cloud15End =
-        -cloud15.offsetHeight * 0.5 - 100;
-
-
-    const cloud15Y =
-        cloud15Start +
-        (cloud15End - cloud15Start) *
-        cloud15Progress;
-
-
-    /*
-        ====================================
-        WOLKE 2
-        ====================================
-    */
-
-    let cloud2Progress =
-        (progress - cloud2Delay) /
-        (cloudMovementEnd - cloud2Delay);
-
-    cloud2Progress =
-        clamp(cloud2Progress);
-
-    cloud2Progress =
-        cloud2Progress *
-        cloud2Progress *
-        (3 - 2 * cloud2Progress);
-
-
-    const cloud2Start =
-        -cloud2.offsetHeight * 0.95;
-
-    /*
-        Layer 2 endet etwas weiter unten
-        als Layer 1.
-
-        Dadurch schiebt er sich sichtbar
-        über Layer 1.
-    */
-    const cloud2End =
-        -cloud2.offsetHeight * 0.3;
-
-
-    const cloud2Y =
-        cloud2Start +
-        (cloud2End - cloud2Start) *
-        cloud2Progress;
-
-
-    /*
-        ====================================
-        POSITIONEN ANWENDEN
-        ====================================
-    */
-
-    /*
-        Kleine seitliche Drift.
-        Bewusst unterschiedlich pro Ebene.
-    */
-
-    const cloud1X =
-        -25 * cloud1Progress;
-
-    const cloud15X =
-        18 * cloud15Progress;
-
-    const cloud2X =
-        -40 * cloud2Progress;
-
-
-    /*
-        Zusätzlich minimal skalieren.
-        Dadurch wirkt Rauch eher so,
-        als würde er sich ausbreiten.
-    */
-
-    const cloud1Scale =
-        1 + 0.025 * cloud1Progress;
-
-    const cloud15Scale =
-        1 + 0.04 * cloud15Progress;
-
-    const cloud2Scale =
-        1 + 0.055 * cloud2Progress;
-
-
-    cloud1.style.transform =
-        `translate(calc(-50% + ${cloud1X}px), ${cloud1Y}px)
-        scale(${cloud1Scale})`;
-
-    cloud15.style.transform =
-        `translate(calc(-50% + ${cloud15X}px), ${cloud15Y}px)
-        scale(${cloud15Scale})`;
-
-    cloud2.style.transform =
-        `translate(calc(-50% + ${cloud2X}px), ${cloud2Y}px)
-        scale(${cloud2Scale})`;
-        
-    /*
-        ====================================
-        SICHTBARKEIT DER WOLKEN
-        ====================================
-    */
-
-    cloud1.style.opacity =
-        clamp(progress * 6);
-
-    cloud15.style.opacity =
-        clamp(cloud15Progress * 6);
-
-    cloud2.style.opacity =
-        clamp(cloud2Progress * 6);
-
-
-    /*
-        ====================================
-        TITEL
-        ====================================
-    */
-
-    let textProgress =
-        (progress - titleStart) /
-        (1 - titleStart);
-
-    textProgress =
-        clamp(textProgress);
-
-
-    textProgress =
-        textProgress *
-        textProgress *
-        (3 - 2 * textProgress);
-
-
+/*
+====================================
+EINSTELLUNGEN
+====================================
+*/
+
+const TITLE_SETTINGS = {
+    cloudMovementEnd: 0.72,
+
+    // Titel erscheint
+    titleFadeIn: [0.58, 0.70],
+
+    // Titel verschwindet, Infotext erscheint
+    infoFadeIn: [0.78, 0.84]
+};
+
+// Individuelle Einstellungen der Rauchwolken
+const TITLE_CLOUDS = [
+    {
+        element: cloud1,
+        delay: 0,
+        startFactor: 0.90,
+        endFactor: 0.45,
+        endOffset: 400,
+        driftX: -25,
+        scaleGrowth: 0.025
+    },
+    {
+        element: cloud15,
+        delay: 0.04,
+        startFactor: 0.925,
+        endFactor: 0.50,
+        endOffset: -100,
+        driftX: 18,
+        scaleGrowth: 0.04
+    },
+    {
+        element: cloud2,
+        delay: 0.08,
+        startFactor: 0.95,
+        endFactor: 0.30,
+        endOffset: 0,
+        driftX: -40,
+        scaleGrowth: 0.055
+    }
+];
+
+const titleHeading = titleScreen.querySelector("h1");
+
+
+/*
+====================================
+HILFSFUNKTION
+====================================
+*/
+
+// Gibt einen weich animierten Fortschritt
+// zwischen 0 und 1 zurück.
+function easeBetween(progress, start, end) {
+    const t = clamp((progress - start) / (end - start));
+
+    return t * t * (3 - 2 * t);
+}
+
+
+/*
+====================================
+RAUCHWOLKEN
+====================================
+*/
+
+function updateTitleClouds(progress) {
+
+    TITLE_CLOUDS.forEach((cloud, index) => {
+
+        const movement = easeBetween(
+            progress,
+            cloud.delay,
+            TITLE_SETTINGS.cloudMovementEnd
+        );
+
+        // Vertikale Positionen
+        const startY =
+            -cloud.element.offsetHeight * cloud.startFactor;
+
+        const endY =
+            -cloud.element.offsetHeight * cloud.endFactor
+            + cloud.endOffset;
+
+        const y = startY + (endY - startY) * movement;
+
+        // Seitliche Drift
+        const x = cloud.driftX * movement;
+
+        // Leichte Vergrößerung
+        const scale = 1 + cloud.scaleGrowth * movement;
+
+        cloud.element.style.transform =
+            `translate(calc(-50% + ${x}px), ${y}px)
+             scale(${scale})`;
+
+        // Sichtbarkeit wie bisher
+        cloud.element.style.opacity =
+            index === 0
+                ? clamp(progress * 6)
+                : clamp(movement * 6);
+    });
+}
+
+
+/*
+====================================
+TITEL UND INFOTEXT
+====================================
+*/
+
+function updateTitleTexts(progress) {
+
+    const titleAppear = easeBetween(
+        progress,
+        ...TITLE_SETTINGS.titleFadeIn
+    );
+
+    const infoAppear = easeBetween(
+        progress,
+        ...TITLE_SETTINGS.infoFadeIn
+    );
+
+    // TITEL
     titleScreen.style.opacity =
-        textProgress;
-
-
-    const title =
-        titleScreen.querySelector("h1");
-
-
-    const scale =
-        1.08 - textProgress * 0.08;
-
-
-    title.style.transform =
-        `scale(${scale})`;
-
-    /*
-    ====================================
-    PHASE 3 – TITEL → INFOTEXT
-    ====================================
-    */
-
-    /*
-        Ab diesem Punkt beginnt der Titel
-        wieder zu verschwinden.
-
-        0.82 = 82 % der Title-Phase
-    */
-    const infoTransitionStart = 0.87;
-
-
-    /*
-        Wie weit sind wir durch die
-        Überblendung?
-    */
-
-    let infoProgress =
-        (progress - infoTransitionStart) /
-        (1 - infoTransitionStart);
-
-    infoProgress =
-        clamp(infoProgress);
-
-
-    /*
-        Smoothstep
-    */
-
-    infoProgress =
-        infoProgress *
-        infoProgress *
-        (3 - 2 * infoProgress);
-
-
-    /*
-        -------------------------
-        TITEL VERSCHWINDET
-        -------------------------
-    */
-
-    titleScreen.style.opacity =
-        textProgress * (1 - infoProgress);
-
-
-    /*
-        Beim Verschwinden wird der Titel
-        minimal unscharf.
-    */
+        titleAppear * (1 - infoAppear);
 
     titleScreen.style.filter =
-        `blur(${infoProgress * 6}px)`;
+        `blur(${infoAppear * 6}px)`;
 
+    const titleScale = 1.08 - titleAppear * 0.08;
+    const titleY = -20 * infoAppear;
 
-    /*
-        Gleichzeitig bewegt er sich
-        ganz leicht nach oben.
-    */
-
-    const titleY =
-        -20 * infoProgress;
-
-    const titleScale =
-        1.08 - textProgress * 0.08;
-
-    title.style.transform =
+    titleHeading.style.transform =
         `translateY(${titleY}px) scale(${titleScale})`;
 
 
-    /*
-        -------------------------
-        INFOTEXT ERSCHEINT
-        -------------------------
-    */
-
-    introInfo.style.opacity =
-        infoProgress;
-
-
-    /*
-        Infotext wird beim Auftauchen scharf.
-    */
+    // INFOTEXT
+    introInfo.style.opacity = infoAppear;
 
     introInfo.style.filter =
-        `blur(${(1 - infoProgress) * 6}px)`;
+        `blur(${(1 - infoAppear) * 6}px)`;
 
-
-    /*
-        Und bewegt sich leicht nach oben
-        an seine endgültige Position.
-    */
-
-    const infoY =
-        20 * (1 - infoProgress);
+    const infoY = 20 * (1 - infoAppear);
 
     introInfo.style.transform =
         `translateY(${infoY}px)`;
+}
+
+
+/*
+====================================
+HAUPTFUNKTION
+====================================
+*/
+
+function updateTitle(progress) {
+    updateTitleClouds(progress);
+    updateTitleTexts(progress);
 }
 
 //------------------------------------------------------------ Szene 2 ----------------------------------------------------
@@ -737,7 +493,7 @@ function updateScene2(progress) {
         -----------------------------
     */
 
-    let revealProgress = rangeProgress(progress, 0.00, 0.12);
+    let revealProgress = rangeProgress(progress, 0.00, 0.07);
     revealProgress = smoothstep(revealProgress);
 
     scene2Sticky.style.opacity = revealProgress;

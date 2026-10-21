@@ -8,9 +8,13 @@ body {
     padding: 0;
 }
 
-/*Das ist die gesamte Scrollstrecke: Erweitern, wenn Website länger wird! Wichtig!*/
+/*Das ist die gesamte Scrollstrecke der ersten Szene: Erweitern, wenn Website länger wird! Wichtig!*/
+:root {
+    --parallax-height: 900vh;
+}
+
 .parallax-section {
-    height: 700vh;
+    height: var(--parallax-height);
     position: relative;
 }
 
@@ -53,49 +57,48 @@ body {
 
 .prolog {
     position: absolute;
-
     z-index: 20;
 
     top: 18vh;
     left: 0;
 
     width: 100%;
-    height: 100px;
-
-    overflow: hidden;
+    height: 180px;
 
     pointer-events: none;
 }
 
-
 .prolog-text {
+    position: absolute;
+    inset: 0;
+}
+
+.prolog-line {
     position: absolute;
 
     top: 50%;
-    left: 0;
+    left: 50%;
 
-    display: flex;
+    width: min(850px, 88vw);
+    margin: 0;
 
-    gap: 0.45em;
+    transform: translate(-50%, -50%);
 
-    white-space: nowrap;
+    text-align: center;
+    text-wrap: balance;
 
+    font-family: Georgia, serif;
     font-size: clamp(22px, 2.2vw, 36px);
-
-    transform: translateY(-50%);
+    line-height: 1.5;
 
     color: white;
-}
 
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
 
-.prolog-text span {
     opacity: 0;
-
     filter: blur(8px);
 
-    transition:
-        opacity 0.05s linear,
-        filter 0.05s linear;
+    will-change: opacity, transform, filter;
 }
 
 /*---------------------Titel Hintergrund--------------------*/
@@ -260,6 +263,12 @@ body {
 .scene2-section {
     position: relative;
     height: 450vh;
+
+    /* Beide Szenen überlappen sich */
+    margin-top: calc(var(--parallax-height) / -7.5);
+
+    /* Szene 2 liegt über Szene 1 */
+    z-index: 50;
 }
 
 .scene2-sticky {
