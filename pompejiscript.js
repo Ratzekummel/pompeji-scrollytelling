@@ -36,7 +36,7 @@ const separationStart = 0.55;
 
 
 // ------------------------------------------ AUFTEILUNG DER GESAMTEN SCROLLSTRECKE ---------------------------------
-const PROLOG_END = 0.2;
+const PROLOG_END = 0.1;
 const PARALLAX_END = 0.65;
 
 
